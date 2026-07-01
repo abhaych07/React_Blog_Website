@@ -1,39 +1,56 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import './App.css'
-import authService from "./appwrite/auth"
-import {login, logout} from "./store/authSlice"
-import Footer from './components/footer/footer.jsx'
-import Header from './components/header/header.jsx'
-import { Outlet } from 'react-router-dom'
+import React, { useState, useEffect } from "react";
+import "./App.css";
+
+import { Outlet } from "react-router-dom";
+
+import { useDispatch } from "react-redux";
+
+import authService from "./appwrite/auth";
+
+import { login, logout } from "./store/authSlice";
+
+import Header from "./components/header/header";
+import Footer from "./components/footer/footer";
 
 function App() {
-  const [loading, setLoading] = useState(true)
-  const dispatch = useDispatch()
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    authService.getCurrentuser()
-    .then((userData) => {
-      if (userData) {
-        dispatch(login({userData}))
-      } else {
-        dispatch(logout())
-      }
-    })
-    .finally(() => setLoading(false))
-  }, [])
-  
-  return !loading ? (
-    <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
-      <div className='w-full block'>
-        <Header />
-        <main className="text-center">
-        TODO:  <Outlet />
-        </main>
-        <Footer />
-      </div>
-    </div>
-  ) : null
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        authService
+            .getCurrentuser()
+            .then((userData) => {
+                if (userData) {
+                    dispatch(login({ userData }));
+                } else {
+                    dispatch(logout());
+                }
+            })
+            .finally(() => setLoading(false));
+    }, [dispatch]);
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-100">
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex min-h-screen flex-col bg-slate-50">
+
+            <Header />
+
+            <main className="flex-1 py-10">
+                <Outlet />
+            </main>
+
+            <Footer />
+
+        </div>
+    );
 }
 
-export default App
+export default App;

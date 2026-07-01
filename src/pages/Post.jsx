@@ -7,20 +7,27 @@ import { useSelector } from "react-redux";
 
 export default function Post() {
     const [post, setPost] = useState(null);
+
     const { slug } = useParams();
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
 
-    const isAuthor = post && userData ? post.userId === userData.$id : false;
+    const isAuthor =
+        post && userData ? post.userId === userData.$id : false;
 
     useEffect(() => {
         if (slug) {
             appwriteService.getPost(slug).then((post) => {
-                if (post) setPost(post);
-                else navigate("/");
+                if (post) {
+                    setPost(post);
+                } else {
+                    navigate("/");
+                }
             });
-        } else navigate("/");
+        } else {
+            navigate("/");
+        }
     }, [slug, navigate]);
 
     const deletePost = () => {
@@ -32,38 +39,58 @@ export default function Post() {
         });
     };
 
-    return post ? (
-        <div className="py-8">
+    if (!post) return null;
+
+    return (
+        <section className="py-12">
             <Container>
-                <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
-                    
+
+                <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
+
                     <img
-                    
                         src={appwriteService.getFileView(post.featuredImage)}
                         alt={post.title}
-                        className="rounded-xl"
+                        className="h-[500px] w-full object-cover"
                     />
 
-                    {isAuthor && (
-                        <div className="absolute right-6 top-6">
-                            <Link to={`/edit-post/${post.$id}`}>
-                                <Button bgColor="bg-green-500" className="mr-3">
-                                    Edit
-                                </Button>
-                            </Link>
-                            <Button bgColor="bg-red-500" onClick={deletePost}>
-                                Delete
-                            </Button>
+                    <div className="p-10">
+
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+
+                            <h1 className="text-5xl font-bold text-gray-900">
+                                {post.title}
+                            </h1>
+
+                            {isAuthor && (
+                                <div className="flex gap-3">
+
+                                    <Link to={`/edit-post/${post.$id}`}>
+                                        <Button bgColor="bg-green-600">
+                                            ✏ Edit
+                                        </Button>
+                                    </Link>
+
+                                    <Button
+                                        bgColor="bg-red-600"
+                                        onClick={deletePost}
+                                    >
+                                        🗑 Delete
+                                    </Button>
+
+                                </div>
+                            )}
+
                         </div>
-                    )}
-                </div>
-                <div className="w-full mb-6">
-                    <h1 className="text-2xl font-bold">{post.title}</h1>
-                </div>
-                <div className="browser-css">
-                    {parse(post.content)}
+
+                        <div className="mt-10 border-t pt-8 leading-8 text-gray-700 browser-css">
+                            {parse(post.content)}
+                        </div>
+
                     </div>
+
+                </div>
+
             </Container>
-        </div>
-    ) : null;
+        </section>
+    );
 }
