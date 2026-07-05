@@ -175,7 +175,7 @@ export default function PostForm({ post }) {
                             : "bg-indigo-600 hover:bg-indigo-700"
                     }`}
                 >
-                    {post ? "Update Post" : "Publish Post"}
+                    {post ? "Update Post" : "Publish Your Post"}
                 </Button>
 
             </div>
